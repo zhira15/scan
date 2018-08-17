@@ -41,3 +41,4 @@ captures/
 
 # Idea files
 *.idea
+*.DS_Store

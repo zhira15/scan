@@ -1,8 +1,4 @@
-//
-// Created by Anthony Ccapira Avendaño on 8/17/18.
-//
-
-#include "opencv_scanner_tools.h"
+#include "openCVHelper.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <algorithm>
@@ -53,19 +49,19 @@ Mat get_modified_bw(Mat img)
 
 Mat get_modified_enhance(Mat img)
 {
-  Mat lab_image;
-  cvtColor(img,lab_image,CV_BGR2Lab);
-  std::vector<cv::Mat> lab_planes(3);
-  cv::split(lab_image, lab_planes);
-  cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE();
-  clahe->setClipLimit(2);
-  cv::Mat dst;
-  clahe->apply(lab_planes[0], dst);
-  dst.copyTo(lab_planes[0]);
-  cv::merge(lab_planes, lab_image);
-  cv::Mat image_clahe;
-  cv::cvtColor(lab_image, image_clahe, CV_Lab2BGR);
-return image_clahe;
+    Mat lab_image;
+    cvtColor(img,lab_image,CV_BGR2Lab);
+    std::vector<cv::Mat> lab_planes(3);
+    cv::split(lab_image, lab_planes);
+    cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE();
+    clahe->setClipLimit(2);
+    cv::Mat dst;
+    clahe->apply(lab_planes[0], dst);
+    dst.copyTo(lab_planes[0]);
+    cv::merge(lab_planes, lab_image);
+    cv::Mat image_clahe;
+    cv::cvtColor(lab_image, image_clahe, CV_Lab2BGR);
+    return image_clahe;
 }
 
 Mat get_modified_lighten(Mat img)
@@ -144,189 +140,189 @@ jobject mat_to_bitmapp(JNIEnv * env, Mat & src, bool needPremultiplyAlpha, jobje
 
 extern "C" {
 
-    //gray color
-    JNIEXPORT jobject JNICALL Java_com_martin_opencv4android_OpenCVHelper_getGrayBitmapp
-    (JNIEnv *env, jobject thiz,jobject bitmap)
-    {
-        __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Scaning getGrayBitmapp");
-        int ret;
-        AndroidBitmapInfo info;
-        void* pixels = 0;
+//gray color
+JNIEXPORT jobject JNICALL Java_com_martin_opencv4android_OpenCVHelper_getGrayBitmapp
+(JNIEnv *env, jobject thiz,jobject bitmap)
+{
+    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Scaning getGrayBitmapp");
+    int ret;
+    AndroidBitmapInfo info;
+    void* pixels = 0;
 
-        if ((ret = AndroidBitmap_getInfo(env, bitmap, &info)) < 0) {
-            __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"AndroidBitmap_getInfo() failed ! error=%d", ret);
-            return NULL;
-        }
+    if ((ret = AndroidBitmap_getInfo(env, bitmap, &info)) < 0) {
+        __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"AndroidBitmap_getInfo() failed ! error=%d", ret);
+        return NULL;
+    }
 
-        if (info.format != ANDROID_BITMAP_FORMAT_RGBA_8888 )
-        {       __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"Bitmap format is not RGBA_8888!");
-            return NULL;
-        }
+    if (info.format != ANDROID_BITMAP_FORMAT_RGBA_8888 )
+    {       __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"Bitmap format is not RGBA_8888!");
+        return NULL;
+    }
 
-        if ((ret = AndroidBitmap_lockPixels(env, bitmap, &pixels)) < 0) {
-            __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"AndroidBitmap_lockPixels() failed ! error=%d", ret);
-        }
+    if ((ret = AndroidBitmap_lockPixels(env, bitmap, &pixels)) < 0) {
+        __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"AndroidBitmap_lockPixels() failed ! error=%d", ret);
+    }
 
-        Mat mbgra(info.height, info.width, CV_8UC4, pixels);
+    Mat mbgra(info.height, info.width, CV_8UC4, pixels);
+    // init our output image
+    Mat dst = mbgra.clone();
+
+    cvtColor(mbgra, dst, CV_RGBA2GRAY);
+    cvtColor(dst, dst, CV_GRAY2BGR);
+
+    //get source bitmap's config
+    jclass java_bitmap_class = (jclass)env->FindClass("android/graphics/Bitmap");
+    jmethodID mid = env->GetMethodID(java_bitmap_class, "getConfig", "()Landroid/graphics/Bitmap$Config;");
+    jobject bitmap_config = env->CallObjectMethod(bitmap, mid);
+    jobject _bitmap = mat_to_bitmapp(env,dst,false,bitmap_config);
+
+    AndroidBitmap_unlockPixels(env, bitmap);
+    return _bitmap;
+}
+
+
+//magic color
+JNIEXPORT jobject JNICALL Java_com_martin_opencv4android_OpenCVHelper_getMagicBitmapp
+(JNIEnv *env, jobject thiz,jobject bitmap)
+{
+    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Scaning getMagicBitmap");
+    int ret;
+    AndroidBitmapInfo info;
+    void* pixels = 0;
+
+    if ((ret = AndroidBitmap_getInfo(env, bitmap, &info)) < 0) {
+        __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"AndroidBitmap_getInfo() failed ! error=%d", ret);
+        return NULL;
+    }
+
+    if (info.format != ANDROID_BITMAP_FORMAT_RGBA_8888 )
+    {       __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"Bitmap format is not RGBA_8888!");
+        return NULL;
+    }
+
+    if ((ret = AndroidBitmap_lockPixels(env, bitmap, &pixels)) < 0) {
+        __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"AndroidBitmap_lockPixels() failed ! error=%d", ret);
+    }
+
+
+
+    Mat mbgra(info.height, info.width, CV_8UC4, pixels);
+        // init our output image
+        Mat dst1 = mbgra.clone();
+        cvtColor(mbgra ,dst1,CV_RGBA2BGR);
+        Mat lab_image;
+        cvtColor(dst1 ,lab_image,CV_BGR2Lab);
+
+        std::vector<cv::Mat> lab_planes(3);
+          cv::split(lab_image, lab_planes);
+          cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE();
+          clahe->setClipLimit(2);
+          Mat dst;
+          clahe->apply(lab_planes[0], dst);
+          dst.copyTo(lab_planes[0]);
+          cv::merge(lab_planes, lab_image);
+          cv::Mat image_clahe;
+          cv::cvtColor(lab_image, image_clahe, CV_Lab2BGR);
+
+    //get source bitmap's config
+    jclass java_bitmap_class = (jclass)env->FindClass("android/graphics/Bitmap");
+    jmethodID mid = env->GetMethodID(java_bitmap_class, "getConfig", "()Landroid/graphics/Bitmap$Config;");
+    jobject bitmap_config = env->CallObjectMethod(bitmap, mid);
+    jobject _bitmap = mat_to_bitmapp(env,image_clahe,false,bitmap_config);
+
+    AndroidBitmap_unlockPixels(env, bitmap);
+    return _bitmap;
+}
+
+//lighten color
+JNIEXPORT jobject JNICALL Java_com_martin_opencv4android_OpenCVHelper_getLightedBitmapp
+(JNIEnv *env, jobject thiz,jobject bitmap)
+{
+    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Scaning getMagicBitmap");
+    int ret;
+    AndroidBitmapInfo info;
+    void* pixels = 0;
+
+    if ((ret = AndroidBitmap_getInfo(env, bitmap, &info)) < 0) {
+        __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"AndroidBitmap_getInfo() failed ! error=%d", ret);
+        return NULL;
+    }
+
+    if (info.format != ANDROID_BITMAP_FORMAT_RGBA_8888 )
+    {       __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"Bitmap format is not RGBA_8888!");
+        return NULL;
+    }
+
+    if ((ret = AndroidBitmap_lockPixels(env, bitmap, &pixels)) < 0) {
+        __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"AndroidBitmap_lockPixels() failed ! error=%d", ret);
+    }
+
+     Mat mbgra(info.height, info.width, CV_8UC4, pixels);
         // init our output image
         Mat dst = mbgra.clone();
 
-        cvtColor(mbgra, dst, CV_RGBA2GRAY);
-        cvtColor(dst, dst, CV_GRAY2BGR);
+        cvtColor(mbgra,dst,CV_RGBA2BGR);
+        cv::Mat brightened_image = dst*1.3;
+        cv::addWeighted(brightened_image,0.9,dst,0.1,3,dst);
 
-        //get source bitmap's config
-        jclass java_bitmap_class = (jclass)env->FindClass("android/graphics/Bitmap");
-        jmethodID mid = env->GetMethodID(java_bitmap_class, "getConfig", "()Landroid/graphics/Bitmap$Config;");
-        jobject bitmap_config = env->CallObjectMethod(bitmap, mid);
-        jobject _bitmap = mat_to_bitmapp(env,dst,false,bitmap_config);
+    //cvtColor(mbgra * 1.3,dst,CV_BGR2Lab);//
 
-        AndroidBitmap_unlockPixels(env, bitmap);
-        return _bitmap;
+    //get source bitmap's config
+    jclass java_bitmap_class = (jclass)env->FindClass("android/graphics/Bitmap");
+    jmethodID mid = env->GetMethodID(java_bitmap_class, "getConfig", "()Landroid/graphics/Bitmap$Config;");
+    jobject bitmap_config = env->CallObjectMethod(bitmap, mid);
+    jobject _bitmap = mat_to_bitmapp(env,dst,false,bitmap_config);
+
+    AndroidBitmap_unlockPixels(env, bitmap);
+    return _bitmap;
+}
+
+//black and white image
+JNIEXPORT jobject JNICALL Java_com_martin_opencv4android_OpenCVHelper_getBlackWhiteBitmapp
+(JNIEnv *env, jobject thiz,jobject bitmap)
+{
+    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Scaning getBWBitmap -->black and white image");
+    int ret;
+    AndroidBitmapInfo info;
+    void* pixels = 0;
+
+    if ((ret = AndroidBitmap_getInfo(env, bitmap, &info)) < 0) {
+        __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"AndroidBitmap_getInfo() failed ! error=%d", ret);
+        return NULL;
     }
 
-
-    //magic color
-    JNIEXPORT jobject JNICALL Java_com_martin_opencv4android_OpenCVHelper_getMagicBitmapp
-    (JNIEnv *env, jobject thiz,jobject bitmap)
-    {
-        __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Scaning getMagicBitmap");
-        int ret;
-        AndroidBitmapInfo info;
-        void* pixels = 0;
-
-        if ((ret = AndroidBitmap_getInfo(env, bitmap, &info)) < 0) {
-            __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"AndroidBitmap_getInfo() failed ! error=%d", ret);
-            return NULL;
-        }
-
-        if (info.format != ANDROID_BITMAP_FORMAT_RGBA_8888 )
-        {       __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"Bitmap format is not RGBA_8888!");
-            return NULL;
-        }
-
-        if ((ret = AndroidBitmap_lockPixels(env, bitmap, &pixels)) < 0) {
-            __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"AndroidBitmap_lockPixels() failed ! error=%d", ret);
-        }
-
-
-
-        Mat mbgra(info.height, info.width, CV_8UC4, pixels);
-            // init our output image
-            Mat dst1 = mbgra.clone();
-            cvtColor(mbgra ,dst1,CV_RGBA2BGR);
-            Mat lab_image;
-            cvtColor(dst1 ,lab_image,CV_BGR2Lab);
-
-            std::vector<cv::Mat> lab_planes(3);
-              cv::split(lab_image, lab_planes);
-              cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE();
-              clahe->setClipLimit(2);
-              Mat dst;
-              clahe->apply(lab_planes[0], dst);
-              dst.copyTo(lab_planes[0]);
-              cv::merge(lab_planes, lab_image);
-              cv::Mat image_clahe;
-              cv::cvtColor(lab_image, image_clahe, CV_Lab2BGR);
-
-        //get source bitmap's config
-        jclass java_bitmap_class = (jclass)env->FindClass("android/graphics/Bitmap");
-        jmethodID mid = env->GetMethodID(java_bitmap_class, "getConfig", "()Landroid/graphics/Bitmap$Config;");
-        jobject bitmap_config = env->CallObjectMethod(bitmap, mid);
-        jobject _bitmap = mat_to_bitmapp(env,image_clahe,false,bitmap_config);
-
-        AndroidBitmap_unlockPixels(env, bitmap);
-        return _bitmap;
+    if (info.format != ANDROID_BITMAP_FORMAT_RGBA_8888 )
+    {       __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"Bitmap format is not RGBA_8888!");
+        return NULL;
     }
 
-    //lighten color
-    JNIEXPORT jobject JNICALL Java_com_martin_opencv4android_OpenCVHelper_getLightedBitmapp
-    (JNIEnv *env, jobject thiz,jobject bitmap)
-    {
-        __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Scaning getMagicBitmap");
-        int ret;
-        AndroidBitmapInfo info;
-        void* pixels = 0;
-
-        if ((ret = AndroidBitmap_getInfo(env, bitmap, &info)) < 0) {
-            __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"AndroidBitmap_getInfo() failed ! error=%d", ret);
-            return NULL;
-        }
-
-        if (info.format != ANDROID_BITMAP_FORMAT_RGBA_8888 )
-        {       __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"Bitmap format is not RGBA_8888!");
-            return NULL;
-        }
-
-        if ((ret = AndroidBitmap_lockPixels(env, bitmap, &pixels)) < 0) {
-            __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"AndroidBitmap_lockPixels() failed ! error=%d", ret);
-        }
-
-         Mat mbgra(info.height, info.width, CV_8UC4, pixels);
-            // init our output image
-            Mat dst = mbgra.clone();
-
-            cvtColor(mbgra,dst,CV_RGBA2BGR);
-            cv::Mat brightened_image = dst*1.3;
-            cv::addWeighted(brightened_image,0.9,dst,0.1,3,dst);
-
-        //cvtColor(mbgra * 1.3,dst,CV_BGR2Lab);//
-
-        //get source bitmap's config
-        jclass java_bitmap_class = (jclass)env->FindClass("android/graphics/Bitmap");
-        jmethodID mid = env->GetMethodID(java_bitmap_class, "getConfig", "()Landroid/graphics/Bitmap$Config;");
-        jobject bitmap_config = env->CallObjectMethod(bitmap, mid);
-        jobject _bitmap = mat_to_bitmapp(env,dst,false,bitmap_config);
-
-        AndroidBitmap_unlockPixels(env, bitmap);
-        return _bitmap;
+    if ((ret = AndroidBitmap_lockPixels(env, bitmap, &pixels)) < 0) {
+        __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"AndroidBitmap_lockPixels() failed ! error=%d", ret);
     }
 
-    //black and white image
-    JNIEXPORT jobject JNICALL Java_com_martin_opencv4android_OpenCVHelper_getBlackWhiteBitmapp
-    (JNIEnv *env, jobject thiz,jobject bitmap)
-    {
-        __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Scaning getBWBitmap -->black and white image");
-        int ret;
-        AndroidBitmapInfo info;
-        void* pixels = 0;
+    Mat mbgra(info.height, info.width, CV_8UC4, pixels);
+    // init our output image
+    Mat dst = mbgra.clone();
 
-        if ((ret = AndroidBitmap_getInfo(env, bitmap, &info)) < 0) {
-            __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"AndroidBitmap_getInfo() failed ! error=%d", ret);
-            return NULL;
-        }
+    cvtColor(mbgra, dst, CV_RGBA2GRAY);
 
-        if (info.format != ANDROID_BITMAP_FORMAT_RGBA_8888 )
-        {       __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"Bitmap format is not RGBA_8888!");
-            return NULL;
-        }
+    // float alpha = 2.2;
+    // float beta = 0;
+    // dst.convertTo(dst, -1, alpha, beta);
 
-        if ((ret = AndroidBitmap_lockPixels(env, bitmap, &pixels)) < 0) {
-            __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"AndroidBitmap_lockPixels() failed ! error=%d", ret);
-        }
-
-        Mat mbgra(info.height, info.width, CV_8UC4, pixels);
-        // init our output image
-        Mat dst = mbgra.clone();
-
-        cvtColor(mbgra, dst, CV_RGBA2GRAY);
-
-        // float alpha = 2.2;
-        // float beta = 0;
-        // dst.convertTo(dst, -1, alpha, beta);
-
-        //threshold(dst,dst,255,ADAPTIVE_THRESH_GAUSSIAN_C, CV_THRESH_BINARY,15,5);
-       threshold(dst,dst,0,255,THRESH_BINARY | THRESH_OTSU);
-       cvtColor(dst, dst, CV_GRAY2BGR);
+    //threshold(dst,dst,255,ADAPTIVE_THRESH_GAUSSIAN_C, CV_THRESH_BINARY,15,5);
+   threshold(dst,dst,0,255,THRESH_BINARY | THRESH_OTSU);
+   cvtColor(dst, dst, CV_GRAY2BGR);
 
 
-        //get source bitmap's config
-        jclass java_bitmap_class = (jclass)env->FindClass("android/graphics/Bitmap");
-        jmethodID mid = env->GetMethodID(java_bitmap_class, "getConfig", "()Landroid/graphics/Bitmap$Config;");
-        jobject bitmap_config = env->CallObjectMethod(bitmap, mid);
-        jobject _bitmap = mat_to_bitmapp(env,dst,false,bitmap_config);
+    //get source bitmap's config
+    jclass java_bitmap_class = (jclass)env->FindClass("android/graphics/Bitmap");
+    jmethodID mid = env->GetMethodID(java_bitmap_class, "getConfig", "()Landroid/graphics/Bitmap$Config;");
+    jobject bitmap_config = env->CallObjectMethod(bitmap, mid);
+    jobject _bitmap = mat_to_bitmapp(env,dst,false,bitmap_config);
 
-        AndroidBitmap_unlockPixels(env, bitmap);
-        return _bitmap;
+    AndroidBitmap_unlockPixels(env, bitmap);
+    return _bitmap;
 
-    }
+}
 }

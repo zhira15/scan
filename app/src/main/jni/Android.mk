@@ -16,7 +16,7 @@ endif
 
 LOCAL_MODULE := OpenCV
 
-LOCAL_SRC_FILES := opencv_scanner_tools.cpp
+LOCAL_SRC_FILES := openCVHelper.cpp
 
 LOCAL_SRC_FILES += extra_functions.cpp
 LOCAL_LDLIBS    += -lm -llog -landroid
