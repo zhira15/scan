@@ -1,5 +1,7 @@
 package com.scanner.document.document_scanner.di.modules
 
+import com.scanner.document.document_scanner.scan.ScanActivity
+import com.scanner.document.document_scanner.scan.ScanModule
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -9,6 +11,6 @@ import dagger.android.ContributesAndroidInjector
 @Module
 abstract class BuildersModule {
 
-    /*@ContributesAndroidInjector
-    internal abstract fun bindLobbyActivity(): LobbyActivity*/
+    @ContributesAndroidInjector(modules = arrayOf(ScanModule::class))
+    internal abstract fun bindScanActivity(): ScanActivity
 }

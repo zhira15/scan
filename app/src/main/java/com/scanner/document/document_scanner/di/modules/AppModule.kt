@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import com.scanner.document.document_scanner.App
 import com.scanner.document.document_scanner.common.CommonService;
+import com.scanner.document.document_scanner.common.domain.model.CommonCameragRepository
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -21,7 +22,7 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun provideCommonHelloService(): CommonService {
-        return CommonService()
+    fun provideCommonHelloService(): CommonCameragRepository {
+        return CommonCameragRepository()
     }
 }
