@@ -1,4 +1,11 @@
 <resources>
-    <string name="app_name">DocScanDemo</string>
+    <string name="app_name">RavnDocScanDemo</string>
     <string name="data_error">Unable to load data.</string>
+
+    <string name="title_activity_scan">ScanActivity</string>
+    <string name="title_activity_home">Document Scanner</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+    <string name="title_activity_detail">DetailActivity</string>
+    <string name="title_activity_image">Image</string>
 </resources>

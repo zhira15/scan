@@ -72,26 +72,15 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "com.android.support:appcompat-v7:$project.supportLibraryVersion"
 
     // Dagger core
-    //annotationProcessor "com.google.dagger:dagger-compiler:$project.daggerVersion"
-    //implementation "com.google.dagger:dagger:$project.daggerVersion"
+    annotationProcessor "com.google.dagger:dagger-compiler:$project.daggerVersion"
+    implementation "com.google.dagger:dagger:$project.daggerVersion"
 
     // Dagger Android
-    //annotationProcessor "com.google.dagger:dagger-android-processor:$project.daggerVersion"
-    //implementation "com.google.dagger:dagger-android-support:$project.daggerVersion"
-    //implementation "com.google.dagger:dagger-android:$project.daggerVersion"
-
-
-    // Dagger
-    implementation 'com.google.dagger:dagger:2.13'
-    kapt "com.google.dagger:dagger-compiler:2.13"
-    implementation 'com.google.dagger:dagger-android:2.13'
-    implementation 'com.google.dagger:dagger-android-support:2.13'
-    // If you use the support libraries
-    kapt "com.google.dagger:dagger-android-processor:2.13"
-
+    annotationProcessor "com.google.dagger:dagger-android-processor:$project.daggerVersion"
+    implementation "com.google.dagger:dagger-android-support:$project.daggerVersion"
+    implementation "com.google.dagger:dagger-android:$project.daggerVersion"
 
     // if you are not using support library, include this instead
     implementation "com.google.dagger:dagger-android:$project.daggerVersion"
@@ -111,6 +100,11 @@ dependencies {
     implementation "android.arch.lifecycle:runtime:$project.lifecycleVersion"
     implementation "android.arch.lifecycle:extensions:$project.lifecycleVersion"
     annotationProcessor "android.arch.lifecycle:compiler:$project.lifecycleVersion"
+
+    implementation "com.android.support:appcompat-v7:$project.supportLibraryVersion"
+    implementation "com.android.support:design:$project.supportLibraryVersion"
+    implementation "com.android.support:cardview-v7:$project.supportLibraryVersion"
+    implementation "com.itextpdf:itextpdf:5.1.1"
 
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     testImplementation 'junit:junit:4.12'
