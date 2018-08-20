@@ -7,6 +7,8 @@ import com.scanner.document.docscanner.R
 import com.scanner.document.docscanner.ui.global.NetworkAppCompatActivity
 import com.scanner.document.docscanner.util.replaceFragmentInActivity
 import com.scanner.document.docscanner.util.obtainViewModel
+import kotlinx.android.synthetic.main.fragment_home.*
+import timber.log.Timber
 
 /**
  * Created by AnthonyCAS on 8/20/18.

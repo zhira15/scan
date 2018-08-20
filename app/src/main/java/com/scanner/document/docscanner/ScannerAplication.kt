@@ -17,9 +17,9 @@ import timber.log.Timber
  * Created by AnthonyCAS on 8/17/18.
  */
 
-class ScannerAplication : Application(), HasActivityInjector {
-    @Inject
-    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Activity>
+class ScannerAplication : Application() {//}, HasActivityInjector {
+    //@Inject
+    //lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Activity>
 
     override fun onCreate() {
         super.onCreate()
@@ -35,7 +35,7 @@ class ScannerAplication : Application(), HasActivityInjector {
                 .inject(this)*/
     }
 
-    override fun activityInjector(): AndroidInjector<Activity>? {
+    /*override fun activityInjector(): AndroidInjector<Activity>? {
         return dispatchingAndroidInjector
-    }
+    }*/
 }
