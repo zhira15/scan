@@ -247,7 +247,7 @@ jobject mat_to_bitmap(JNIEnv * env, Mat & src, bool needPremultiplyAlpha, jobjec
 
 extern "C" {
 
-    JNIEXPORT jintArray JNICALL OpenCVHelper_gray(
+    JNIEXPORT jintArray JNICALL Java_com_scanner_document_docscanner_activities_OpenCVHelper_gray(
             JNIEnv *env, jclass obj, jintArray buf, int w, int h) {
 
         jint *cbuf;
@@ -276,7 +276,7 @@ extern "C" {
     }
 
 
-    JNIEXPORT jobject JNICALL Java_com_martin_opencv4android_OpenCVHelper_getGrayBitmap
+    JNIEXPORT jobject JNICALL Java_com_scanner_document_docscanner_activities_OpenCVHelper_getGrayBitmap
     (JNIEnv *env, jobject thiz,jobject bitmap)
     {
         __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Scaning getGrayBitmap");
@@ -315,7 +315,7 @@ extern "C" {
     }
 
 
-    JNIEXPORT jintArray JNICALL Java_com_martin_opencv4android_OpenCVHelper_getBoxPoints(
+    JNIEXPORT jintArray JNICALL Java_com_scanner_document_docscanner_activities_OpenCVHelper_getBoxPoints(
             JNIEnv *env, jclass obj, jintArray buf, int w, int h) {
 
         jint *cbuf;
@@ -370,7 +370,7 @@ extern "C" {
         return result;
     }
 
-    JNIEXPORT jintArray JNICALL Java_com_martin_opencv4android_OpenCVHelper_perspective(
+    JNIEXPORT jintArray JNICALL Java_com_scanner_document_docscanner_activities_OpenCVHelper_perspective(
             JNIEnv *env, jclass obj, jintArray buf, jintArray pts, int w, int h) {
         __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "inside the function");
         jint *cbuf;

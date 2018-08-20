@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:background="#000000"
-    tools:context="com.scanner.document.document_scanner.activities.HomeActivity">
+    tools:context="com.scanner.document.docscanner.activities.HomeActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -43,13 +43,13 @@
               />
      </FrameLayout>
 
-     <com.scanner.document.document_scanner.activities.PolygonView
+     <com.scanner.document.docscanner.activities.PolygonView
          android:id="@+id/polygonView"
          android:layout_width="match_parent"
          android:layout_height="match_parent"
          android:layout_gravity="center"
          android:visibility="gone">
-     </com.scanner.document.document_scanner.activities.PolygonView>
+     </com.scanner.document.docscanner.activities.PolygonView>
 
  </FrameLayout>
 

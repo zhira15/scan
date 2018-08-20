@@ -29,13 +29,13 @@
                 android:adjustViewBounds="true" />
         </FrameLayout>
 
-        <com.scanner.document.document_scanner.activities.PolygonView
+        <com.scanner.document.docscanner.activities.PolygonView
             android:id="@+id/polygonView"
             android:layout_margin="5dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:visibility="gone"></com.scanner.document.document_scanner.activities.PolygonView>
+            android:visibility="gone"></com.scanner.document.docscanner.activities.PolygonView>
     </FrameLayout>
 
 

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.scanner.document.document_scanner.activities.HomeActivity"
+    tools:context="com.scanner.document.docscanner.activities.HomeActivity"
     tools:showIn="@layout/activity_home">
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,7 +15,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/rvDocs"/>
-
 
     </LinearLayout>
 

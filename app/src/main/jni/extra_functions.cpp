@@ -141,7 +141,7 @@ jobject mat_to_bitmapp(JNIEnv * env, Mat & src, bool needPremultiplyAlpha, jobje
 extern "C" {
 
 //gray color
-JNIEXPORT jobject JNICALL Java_com_martin_opencv4android_OpenCVHelper_getGrayBitmapp
+JNIEXPORT jobject JNICALL Java_com_scanner_document_docscanner_activities_OpenCVHelper_getGrayBitmapp
 (JNIEnv *env, jobject thiz,jobject bitmap)
 {
     __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Scaning getGrayBitmapp");
@@ -182,7 +182,7 @@ JNIEXPORT jobject JNICALL Java_com_martin_opencv4android_OpenCVHelper_getGrayBit
 
 
 //magic color
-JNIEXPORT jobject JNICALL Java_com_martin_opencv4android_OpenCVHelper_getMagicBitmapp
+JNIEXPORT jobject JNICALL Java_com_scanner_document_docscanner_activities_OpenCVHelper_getMagicBitmapp
 (JNIEnv *env, jobject thiz,jobject bitmap)
 {
     __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Scaning getMagicBitmap");
@@ -235,7 +235,7 @@ JNIEXPORT jobject JNICALL Java_com_martin_opencv4android_OpenCVHelper_getMagicBi
 }
 
 //lighten color
-JNIEXPORT jobject JNICALL Java_com_martin_opencv4android_OpenCVHelper_getLightedBitmapp
+JNIEXPORT jobject JNICALL Java_com_scanner_document_docscanner_activities_OpenCVHelper_getLightedBitmapp
 (JNIEnv *env, jobject thiz,jobject bitmap)
 {
     __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Scaning getMagicBitmap");
@@ -278,7 +278,7 @@ JNIEXPORT jobject JNICALL Java_com_martin_opencv4android_OpenCVHelper_getLighted
 }
 
 //black and white image
-JNIEXPORT jobject JNICALL Java_com_martin_opencv4android_OpenCVHelper_getBlackWhiteBitmapp
+JNIEXPORT jobject JNICALL Java_com_scanner_document_docscanner_activities_OpenCVHelper_getBlackWhiteBitmapp
 (JNIEnv *env, jobject thiz,jobject bitmap)
 {
     __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Scaning getBWBitmap -->black and white image");

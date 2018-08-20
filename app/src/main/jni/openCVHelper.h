@@ -12,7 +12,7 @@ extern "C" {
  * Method:    gray
  * Signature: ([III)[I
  */
-JNIEXPORT jintArray JNICALL OpenCVHelper_gray
+JNIEXPORT jintArray JNICALL Java_com_scanner_document_docscanner_activities_OpenCVHelper_gray
   (JNIEnv *, jclass, jintArray, jint, jint);
 
 /*
@@ -20,7 +20,7 @@ JNIEXPORT jintArray JNICALL OpenCVHelper_gray
  * Method:    detectFeatures
  * Signature: ([III)[I
  */
-JNIEXPORT jintArray JNICALL Java_com_martin_opencv4android_OpenCVHelper_detectFeatures
+JNIEXPORT jintArray JNICALL Java_com_scanner_document_docscanner_activities_OpenCVHelper_detectFeatures
   (JNIEnv *, jclass, jintArray, jint, jint);
 
 #ifdef __cplusplus
