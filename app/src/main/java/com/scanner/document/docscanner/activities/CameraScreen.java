@@ -427,8 +427,7 @@ public class CameraScreen extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        // when on Pause, release camera in order to be used from other
-        // applications
+        // when on Pause, release camera in order to be used from other applications
         releaseCamera();
     }
 

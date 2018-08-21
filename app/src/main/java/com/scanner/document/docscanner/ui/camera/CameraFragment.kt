@@ -28,6 +28,8 @@ class CameraFragment: Fragment() {
                             else ->  {View.GONE }
                         }
                     }
+
+                    cameraPreviewLayout.visibility = View.GONE
                 })
             }
         }
