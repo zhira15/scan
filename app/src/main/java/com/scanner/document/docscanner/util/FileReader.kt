@@ -19,7 +19,7 @@ class FileReader {
     companion object {
 
         object Constants {
-            val DOCS_PATH = "/DocumentScanner/ScannedImage/"
+            val DOCS_PATH = "/RavnDocumentScanner/images/"
             val DIR_PATH = android.os.Environment.getExternalStorageDirectory().toString()
         }
 

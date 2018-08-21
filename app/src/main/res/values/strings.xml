@@ -9,4 +9,6 @@
     <string name="drawer_close">Close</string>
     <string name="title_activity_detail">DetailActivity</string>
     <string name="title_activity_image">Image</string>
+
+    <string name="gallery_dir">RavnScan</string>
 </resources>

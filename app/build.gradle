@@ -1,9 +1,6 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
-
 apply plugin: 'kotlin-kapt'
 
 project.ext {
@@ -20,7 +17,7 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.scanner.document.document_scanner"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -79,13 +76,14 @@ dependencies {
     kapt "com.android.databinding:compiler:$gradlePluginVersion"
 
     // Dagger core
-    annotationProcessor "com.google.dagger:dagger-compiler:$project.daggerVersion"
+    //annotationProcessor "com.google.dagger:dagger-compiler:$project.daggerVersion"
     implementation "com.google.dagger:dagger:$project.daggerVersion"
+    kapt "com.google.dagger:dagger-compiler:$project.daggerVersion"
 
     // Dagger Android
-    annotationProcessor "com.google.dagger:dagger-android-processor:$project.daggerVersion"
-    implementation "com.google.dagger:dagger-android-support:$project.daggerVersion"
-    implementation "com.google.dagger:dagger-android:$project.daggerVersion"
+    //annotationProcessor "com.google.dagger:dagger-android-processor:$project.daggerVersion"
+    //implementation "com.google.dagger:dagger-android-support:$project.daggerVersion"
+    //implementation "com.google.dagger:dagger-android:$project.daggerVersion"
 
     // if you are not using support library, include this instead
     implementation "com.google.dagger:dagger-android:$project.daggerVersion"

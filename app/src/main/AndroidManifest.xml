@@ -20,9 +20,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".scan.ScanActivity">
-        </activity>
-
         <activity
             android:name=".activities.PolygonViewScreen"
             android:theme="@style/AppTheme.NoActionBar" />

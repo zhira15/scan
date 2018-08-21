@@ -10,7 +10,6 @@ import com.scanner.document.docscanner.ui.documents.DocumentsViewModel
 import com.scanner.document.docscanner.ui.global.NetworkAppCompatActivity
 import com.scanner.document.docscanner.util.replaceFragmentInActivity
 import com.scanner.document.docscanner.util.obtainViewModel
-import timber.log.Timber
 
 /**
  * Created by AnthonyCAS on 8/20/18.
@@ -51,6 +50,8 @@ class HomeActivity: NetworkAppCompatActivity(), HomeNavigator {
 
     override fun openCameraApp() {
         startActivity(CameraActivity.newIntent(this))
+        //var intent: Intent = Intent(this, CameraTest::class.java)
+        //startActivity(intent)
     }
 
     //region Binding

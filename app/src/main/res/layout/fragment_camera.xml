@@ -16,12 +16,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
+        <com.scanner.document.docscanner.view.AutoFitTextureView
             android:id="@+id/cameraPreviewLayout"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:orientation="horizontal"
+            android:visibility="visible"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -45,7 +47,8 @@
                 android:layout_height="23dp"
                 android:layout_margin="15dp"
                 android:background="@drawable/flash"
-                android:onClick="@{() -> viewModel.turnOffFlash()}"></ImageView>
+                android:onClick="@{() -> viewModel.turnOffFlash()}"
+                android:contentDescription="TODO"></ImageView>
 
             <ImageView
                 android:id="@+id/flash_off"
@@ -53,7 +56,8 @@
                 android:layout_height="23dp"
                 android:layout_margin="15dp"
                 android:background="@drawable/flash_off"
-                android:onClick="@{() -> viewModel.turnOnFlash()}"></ImageView>
+                android:onClick="@{() -> viewModel.turnOnFlash()}"
+                android:contentDescription="TODO"></ImageView>
         </LinearLayout>
 
         <!-- Standar options -->
@@ -76,11 +80,12 @@
                 android:layout_height="27dp"
                 android:layout_marginBottom="20dp"
                 android:layout_marginLeft="17dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginEnd="20dp"
                 android:layout_marginTop="20dp"
                 android:background="@drawable/settings"
                 android:onClick="@{() -> viewModel.atttempUseSettings()}"
-                android:visibility="@{viewModel.isSettingActive() ? View.GONE : View.VISIBLE}" />
+                android:visibility="@{viewModel.isSettingActive() ? View.GONE : View.VISIBLE}"
+                android:contentDescription="TODO" />
 
             <!-- Setting after -->
             <ImageView

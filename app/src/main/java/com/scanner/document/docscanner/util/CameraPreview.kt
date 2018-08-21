@@ -1,135 +1,284 @@
 package com.scanner.document.docscanner.util
 
-import android.app.Application
-import android.hardware.Camera
-import android.view.MotionEvent
-import android.view.SurfaceHolder
-import android.view.SurfaceView
+/**
+ * Created by AnthonyCAS on 8/21/18.
+ */
+
+import android.annotation.SuppressLint
+import android.graphics.ImageFormat
+import android.graphics.SurfaceTexture
+import android.hardware.camera2.*
+import android.media.ImageReader
+import android.os.Handler
+import android.util.Size
+import android.util.SparseIntArray
+import android.view.Surface
+import android.view.TextureView
+import com.scanner.document.docscanner.ui.camera.CameraNavigator
 import timber.log.Timber
-import java.io.IOException
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 
-class CameraPreview(context: Application, private var camera: Camera?): SurfaceView(context), SurfaceHolder.Callback {
-    private val surfaceHolder: SurfaceHolder
-    internal var distance = 0f
+class CameraPreview : CameraNavigator.Preview {
 
-    init {
-        surfaceHolder = getHolder()
-        surfaceHolder.addCallback(this)
-        surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS)
-    }
+    //general fields
+    private var myView: CameraNavigator.View? = null
+    override var cameraIsReady = false
 
-    override fun surfaceCreated(holder: SurfaceHolder) {
-        try {
-            if (camera == null) {
-                camera?.setPreviewDisplay(holder)
-                camera?.startPreview()
-            }
-        } catch (e: IOException) {
-            Timber.d("Error setting camera preview: " + e.message)
-        }
+    //camera related fields
+    private lateinit var systemCameraManager: CameraManager
+    private var cameraID: String? = "0"
+    private var cameraDevice: CameraDevice? = null
+    private var cameraCaptureSession: CameraCaptureSession? = null
 
-    }
+    private lateinit var previewSurface: Surface
+    private lateinit var textureView: TextureView
+    private lateinit var captureSurface: Surface
+    private var imageReader: ImageReader? = null
 
-    fun refreshCamera(camera: Camera?) {
-        val isSurface = surfaceHolder.getSurface() ?: return
-        // stop preview before making changes
-        try {
-            camera?.stopPreview()
-        } catch (e: Exception) {
-        }
+    private lateinit var previewCaptureRequest: CaptureRequest
+    private lateinit var captureCaptureRequest: CaptureRequest
 
-        // set preview size and make any resize, rotate or
-        // reformatting changes here
-        // start preview with new settings
-        setCamera(camera)
-        try {
-            camera?.setPreviewDisplay(surfaceHolder)
-            camera?.setDisplayOrientation(90)
-            camera?.startPreview()
-        } catch (e: Exception) {
-            Timber.d("Error starting camera preview: " + e.message)
-        }
+    private var sensorOrientation = 0
+    private var flashSupported = false
+    private lateinit var maxPhotoSize: Size
+    private lateinit var previewSurfaceSize: Size
 
-    }
+    private lateinit var fileSaveFolder: String
+    private lateinit var capturedImageFilename: String
 
-    override fun surfaceChanged(holder: SurfaceHolder, format: Int, w: Int, h: Int) {
-        // If your preview can change or rotate, take care of those events here.
-        // Make sure to stop the preview before resizing or reformatting it.
-        refreshCamera(camera)
-    }
+    private var backgroundHandler: Handler? = null
 
-    fun setCamera(currentCamera: Camera?) {
-        // method to set a camera instance
-        camera = currentCamera
-    }
+    override fun launchCameraPreview(systemCameraManager: CameraManager, textureView: TextureView) {
+        this.systemCameraManager = systemCameraManager
+        this.textureView = textureView
 
-    override fun surfaceDestroyed(holder: SurfaceHolder) {
-        // camera.release();
+        backgroundHandler = myView?.backgroundHandler
+
+        configureCamera()
+        openCamera()
 
     }
 
-    override fun onTouchEvent(event: MotionEvent): Boolean {
-        // Get the pointer ID
-        val params = camera!!.getParameters()
-        val action = event.getAction()
+    private fun configureCamera() {
 
-        if (event.getPointerCount() > 1) {
-            // handle multi-touch events
-            if (action == MotionEvent.ACTION_POINTER_DOWN) {
-                distance = getFingerSpacing(event)
-            } else if (action == MotionEvent.ACTION_MOVE && params.isZoomSupported()) {
-                camera!!.cancelAutoFocus()
-                handleZoom(event, params)
-            }
-        } else {
-            // handle single touch events
-            if (action == MotionEvent.ACTION_UP) {
-                handleFocus(event, params)
-            }
-        }
-        return true
-    }
+        for (tempCamID in systemCameraManager.cameraIdList) {
 
-    private fun handleZoom(event: MotionEvent, params: Camera.Parameters) {
-        val maxZoom = params.getMaxZoom()
-        var zoom = params.getZoom()
-        val newDist = getFingerSpacing(event)
-        if (newDist > distance) {
-            // zoom in
-            if (zoom < maxZoom)
-                zoom++
-        } else if (newDist < distance) {
-            // zoom out
-            if (zoom > 0)
-                zoom--
-        }
-        distance = newDist
-        params.setZoom(zoom)
-        camera?.setParameters(params)
-    }
+            val cameraCharacteristics = systemCameraManager.getCameraCharacteristics(tempCamID)
 
-    fun handleFocus(event: MotionEvent, params: Camera.Parameters) {
-        val pointerId = event.getPointerId(0)
-        val pointerIndex = event.findPointerIndex(pointerId)
-        // Get the pointer's current position
-        val x = event.getX(pointerIndex)
-        val y = event.getY(pointerIndex)
+            val cameraDirection = cameraCharacteristics.get(CameraCharacteristics.LENS_FACING)
+            if (cameraDirection != null && cameraDirection == CameraCharacteristics.LENS_FACING_BACK) {
+                cameraID = tempCamID
 
-        val supportedFocusModes = params.getSupportedFocusModes()
-        if (supportedFocusModes != null && supportedFocusModes?.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
-            camera?.autoFocus(object : Camera.AutoFocusCallback {
-                override fun onAutoFocus(b: Boolean, camera: Camera) {
-                    // currently set to auto-focus on single touch
+                val deviceLevel = cameraCharacteristics.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL)
+                when (deviceLevel) {
+                    CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY -> Timber.d("Camera support level: LEGACY")
+                    CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED -> Timber.d("Camera support level: LIMITED")
+                    CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL -> Timber.d("Camera support level: FULL")
+                    CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_3 -> Timber.d("Camera support level: 3")
                 }
-            })
+
+                sensorOrientation = cameraCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION)
+                flashSupported = cameraCharacteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE) == true
+
+                val scalerMap = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
+
+                val outputSizes = scalerMap.getOutputSizes(ImageFormat.JPEG)
+
+                maxPhotoSize = Collections.max(Arrays.asList(*outputSizes), CompareSizesByArea())
+
+                previewSurfaceSize = chooseOptimalSize(scalerMap.getOutputSizes(SurfaceTexture::class.java),
+                        textureView.height, textureView.width, MAX_PREVIEW_WIDTH, MAX_PREVIEW_HEIGHT, maxPhotoSize)
+
+                myView?.setTextureViewAspectRatio(previewSurfaceSize.height, previewSurfaceSize.width)
+
+                imageReader = ImageReader.newInstance(maxPhotoSize.width, maxPhotoSize.height, ImageFormat.JPEG, 1).apply {
+                    setOnImageAvailableListener(onImageAvailableListener, backgroundHandler)
+                }
+
+                captureSurface = imageReader?.surface!!
+            }
         }
     }
 
-    /** Determine the space between the first two fingers  */
-    private fun getFingerSpacing(event: MotionEvent): Float {
-        // ...
-        val x = event.getX(0) - event.getX(1)
-        val y = event.getY(0) - event.getY(1)
-        return Math.sqrt((x * x + y * y).toDouble()).toFloat()
+    private val onImageAvailableListener = ImageReader.OnImageAvailableListener {
+        // saving procedure
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val filename = "ravn_$timeStamp.jpg"
+        val file = File(fileSaveFolder, filename)
+        capturedImageFilename = file.path
+
+        //val t1 = System.currentTimeMillis()
+        val img = it.acquireNextImage()
+        //Timber.e("Time for imageReader.acquireNextImage: ${System.currentTimeMillis() - t1}ms $capturedImageFilename")
+        backgroundHandler?.post(ImageSaver(img, file))
+        myView?.openPreviewActivity(capturedImageFilename)
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun openCamera() {
+        try {
+            systemCameraManager.openCamera(cameraID, object : CameraDevice.StateCallback() {
+                override fun onOpened(camera: CameraDevice?) {
+                    cameraDevice = camera
+                    preparePreviewCaptureRequest()
+                    createCameraCaptureSession()
+                    cameraIsReady = true
+                }
+
+                override fun onDisconnected(camera: CameraDevice?) {
+                    cameraDevice?.close()
+                }
+
+                override fun onError(camera: CameraDevice?, error: Int) {
+                    Timber.e("Camera error on Open Camera. Error code: $error")
+                }
+            }, null)
+        } catch (e: CameraAccessException) {
+            Timber.e(e.toString())
+        }
+    }
+
+    private fun preparePreviewCaptureRequest() {
+        try {
+
+            previewSurface = Surface(textureView.surfaceTexture.apply { setDefaultBufferSize(previewSurfaceSize.width, previewSurfaceSize.height) })
+
+            previewCaptureRequest = cameraDevice?.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)!!.run {
+                addTarget(previewSurface)
+                set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
+                set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH)
+                build()
+            }
+        } catch (e: CameraAccessException) {
+            Timber.e(e.toString())
+        }
+    }
+
+    private fun prepareCaptureCaptureRequest() {
+        try {
+            captureCaptureRequest = cameraDevice?.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE)!!.run {
+                addTarget(captureSurface)
+//                set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
+                set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
+
+                set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH)
+                set(CaptureRequest.JPEG_ORIENTATION, (ORIENTATIONS.get(myView?.getScreenRotation()!!) + sensorOrientation + 270) % 360)
+                build()
+            }
+        } catch (e: CameraAccessException) {
+            Timber.e(e.toString())
+        }
+    }
+
+    private fun createCameraCaptureSession() {
+
+        cameraDevice?.createCaptureSession(Arrays.asList(previewSurface, captureSurface),
+                object : CameraCaptureSession.StateCallback() {
+
+                    override fun onConfigured(cameraCaptureSession: CameraCaptureSession) {
+                        if (cameraDevice == null) return
+
+                        this@CameraPreview.cameraCaptureSession = cameraCaptureSession
+
+                        try {
+                            cameraCaptureSession.setRepeatingRequest(previewCaptureRequest, null, backgroundHandler)
+                        } catch (e: CameraAccessException) {
+                            Timber.e("Error creating Camera Capture Session. Details: $e")
+                        }
+
+                    }
+
+                    override fun onConfigureFailed(session: CameraCaptureSession) {
+                        Timber.e("Camera configuration failed at creating camera capture session")
+                    }
+                }, null)
+
+    }
+
+    override fun captureImage() {
+        prepareCaptureCaptureRequest()
+
+        try {
+            cameraCaptureSession?.apply {
+                val t2 = System.currentTimeMillis()
+                capture(captureCaptureRequest, object : CameraCaptureSession.CaptureCallback() {
+                    override fun onCaptureCompleted(session: CameraCaptureSession, request: CaptureRequest, result: TotalCaptureResult) {
+                        Timber.d("Time for CAPTURE: ${System.currentTimeMillis() - t2}ms")
+                    }
+                }, backgroundHandler)
+            }
+        } catch (e: CameraAccessException) {
+            Timber.e(e.toString())
+        }
+    }
+
+    private fun closeCamera() {
+
+        cameraCaptureSession?.close()
+        cameraCaptureSession = null
+
+        cameraDevice?.close()
+        cameraDevice = null
+
+        imageReader?.close()
+        imageReader = null
+
+        cameraIsReady = false
+
+    }
+
+    // ------------------------ functions --------------------------------
+    override fun attachView(view: CameraNavigator.View) {
+        this.myView = view
+        fileSaveFolder = myView?.getGalleryFolder()!!
+    }
+
+    override fun detachView() {
+        closeCamera()
+        backgroundHandler = null
+    }
+
+    companion object {
+
+        private val ORIENTATIONS = SparseIntArray()
+
+        init {
+            ORIENTATIONS.append(Surface.ROTATION_0, 90)
+            ORIENTATIONS.append(Surface.ROTATION_90, 0)
+            ORIENTATIONS.append(Surface.ROTATION_180, 270)
+            ORIENTATIONS.append(Surface.ROTATION_270, 180)
+        }
+
+        private val MAX_PREVIEW_WIDTH = 1920
+        private val MAX_PREVIEW_HEIGHT = 1080
+
+        private fun chooseOptimalSize(choices: Array<Size>, textureViewWidth: Int, textureViewHeight: Int, maxWidth: Int, maxHeight: Int, aspectRatio: Size): Size {
+
+            val bigEnough = ArrayList<Size>()
+
+            val notBigEnough = ArrayList<Size>()
+            val w = aspectRatio.width
+            val h = aspectRatio.height
+            choices.filter { it.width <= maxWidth && it.height <= maxHeight && it.height == it.width * h / w }
+                    .forEach {
+                        if (it.width >= textureViewWidth && it.height >= textureViewHeight) {
+                            bigEnough.add(it)
+                        } else {
+                            notBigEnough.add(it)
+                        }
+                    }
+
+            return when {
+                bigEnough.size > 0 -> Collections.min(bigEnough, CompareSizesByArea())
+                notBigEnough.size > 0 -> Collections.max(notBigEnough, CompareSizesByArea())
+                else -> {
+                    Timber.d("Couldn't find any suitable preview size")
+                    choices[0]
+                }
+            }
+        }
+
     }
 }
