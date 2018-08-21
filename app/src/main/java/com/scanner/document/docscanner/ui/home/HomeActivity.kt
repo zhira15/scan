@@ -1,13 +1,16 @@
 package com.scanner.document.docscanner.ui.home
 
+import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import com.scanner.document.docscanner.R
+import com.scanner.document.docscanner.ui.camera.CameraActivity
 import com.scanner.document.docscanner.ui.documents.DocumentsViewModel
 import com.scanner.document.docscanner.ui.global.NetworkAppCompatActivity
 import com.scanner.document.docscanner.util.replaceFragmentInActivity
 import com.scanner.document.docscanner.util.obtainViewModel
+import timber.log.Timber
 
 /**
  * Created by AnthonyCAS on 8/20/18.
@@ -23,6 +26,7 @@ class HomeActivity: NetworkAppCompatActivity(), HomeNavigator {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
         setupViewFragment()
+        setupViewModel()
     }
 
     override fun onResume() {
@@ -39,11 +43,14 @@ class HomeActivity: NetworkAppCompatActivity(), HomeNavigator {
     private fun setupViewModel() {
         viewModel = obtainViewModel().apply {
             // observers
+            openCamera.observe(this@HomeActivity, Observer {
+                openCameraApp()
+            })
         }
     }
 
     override fun openCameraApp() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        startActivity(CameraActivity.newIntent(this))
     }
 
     //region Binding

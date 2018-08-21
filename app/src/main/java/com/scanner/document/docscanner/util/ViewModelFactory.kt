@@ -5,6 +5,7 @@ import android.app.Application
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.support.annotation.VisibleForTesting
+import com.scanner.document.docscanner.ui.camera.CameraViewModel
 import com.scanner.document.docscanner.ui.documents.DocumentsViewModel
 import com.scanner.document.docscanner.ui.home.HomeViewModel
 
@@ -23,6 +24,8 @@ class ViewModelFactory private constructor(
                         HomeViewModel(application)
                     isAssignableFrom(DocumentsViewModel::class.java) ->
                             DocumentsViewModel(application)
+                    isAssignableFrom(CameraViewModel::class.java) ->
+                            CameraViewModel(application)
                     else ->
                         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }

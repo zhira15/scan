@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingPrefix"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
+
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="viewModel"
+            type="com.scanner.document.docscanner.ui.camera.CameraViewModel" />
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/cameraPreview"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Flash options -->
+        <LinearLayout
+            android:id="@+id/extraOptions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <ImageView
+                android:id="@+id/flash_on"
+                android:layout_width="20dp"
+                android:layout_height="23dp"
+                android:layout_margin="15dp"
+                android:background="@drawable/flash"
+                android:onClick="@{() -> viewModel.turnOffFlash()}"></ImageView>
+
+            <ImageView
+                android:id="@+id/flash_off"
+                android:layout_width="20dp"
+                android:layout_height="23dp"
+                android:layout_margin="15dp"
+                android:background="@drawable/flash_off"
+                android:onClick="@{() -> viewModel.turnOnFlash()}"></ImageView>
+        </LinearLayout>
+
+        <!-- Standar options -->
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:background="@color/colorPrimary"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <!-- Setting before -->
+            <ImageView
+                android:id="@+id/settingBefore"
+                android:layout_width="30dp"
+                android:layout_height="27dp"
+                android:layout_marginBottom="20dp"
+                android:layout_marginLeft="17dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/settings"
+                android:onClick="@{() -> viewModel.atttempUseSettings()}"
+                android:visibility="@{viewModel.isSettingActive() ? View.GONE : View.VISIBLE}" />
+
+            <!-- Setting after -->
+            <ImageView
+                android:id="@+id/settingAfter"
+                android:layout_width="30dp"
+                android:layout_height="27dp"
+                android:layout_margin="20dp"
+                android:background="@drawable/setting_after"
+                android:onClick="@{() -> viewModel.atttempUseSettings()}"
+                android:visibility="@{viewModel.isSettingActive()? View.VISIBLE : View.GONE}" />
+
+
+            <!-- camera btn -->
+            <Button
+                android:id="@+id/cameraBtn"
+                android:layout_width="50dp"
+                android:layout_height="45dp"
+                android:layout_margin="20dp"
+                android:background="@drawable/cameranew"
+                android:onClick="@{() -> viewModel.attempTakePicture()}" />
+
+        </LinearLayout>
+    </android.support.constraint.ConstraintLayout>
+</layout>

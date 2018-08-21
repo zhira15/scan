@@ -41,13 +41,6 @@ class DocumentsViewModel(context: Application): AndroidViewModel(context) {
 
     fun reloadData() {
         state.value = DocumentsViewState.LOADING
-/*      var postemail: DocItem = DocItem("Dummy Doc", "12/09/16", null)
-        documentList.add(postemail)
-        documentList.add(postemail)
-        documentList.add(postemail)
-        documentList.add(postemail)
-        documentList.add(postemail)
-        adapter.items = documentList*/
         adapter.items = FileReader.walk()
         isEmpty.set(adapter.isEmpty())
         state.value = DocumentsViewState.COMPLETE

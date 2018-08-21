@@ -27,10 +27,6 @@ class HomeFragment: Fragment() {
             viewModel = (activity as HomeActivity).obtainViewModel()
 
             viewModel?.apply {
-
-                openCamera.observe(this@HomeFragment, Observer {
-                    scanDocument()
-                })
             }
         }
         return viewDataBinding.root
@@ -46,10 +42,6 @@ class HomeFragment: Fragment() {
     private fun setupContainerViewFragment() {
 
 
-    }
-
-    private fun scanDocument() {
-        Timber.e("Scanning")
     }
 
     companion object {
