@@ -4,11 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import com.scanner.document.docscanner.R
+import com.scanner.document.docscanner.ui.documents.DocumentsViewModel
 import com.scanner.document.docscanner.ui.global.NetworkAppCompatActivity
 import com.scanner.document.docscanner.util.replaceFragmentInActivity
 import com.scanner.document.docscanner.util.obtainViewModel
-import kotlinx.android.synthetic.main.fragment_home.*
-import timber.log.Timber
 
 /**
  * Created by AnthonyCAS on 8/20/18.
@@ -49,6 +48,7 @@ class HomeActivity: NetworkAppCompatActivity(), HomeNavigator {
 
     //region Binding
     fun obtainViewModel(): HomeViewModel = obtainViewModel(HomeViewModel::class.java)
+    fun obtainDocumentsViewModel(): DocumentsViewModel = obtainViewModel(DocumentsViewModel::class.java)
     //endregion
 
     //region Companion Object

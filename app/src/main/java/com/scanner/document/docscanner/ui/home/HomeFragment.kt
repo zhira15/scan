@@ -6,7 +6,10 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.scanner.document.docscanner.R
 import com.scanner.document.docscanner.databinding.FragmentHomeBinding
+import com.scanner.document.docscanner.ui.documents.DocumentsFragment
+import com.scanner.document.docscanner.util.replaceFragmentInActivity
 import kotlinx.android.synthetic.main.fragment_home.*
 import timber.log.Timber
 
@@ -35,6 +38,14 @@ class HomeFragment: Fragment() {
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        toolbar.title = "Ravn Document Scanner"
+        val transaction = childFragmentManager.beginTransaction()
+        transaction.replace(R.id.documents_container, DocumentsFragment.newInstance()).commit()
+    }
+
+    private fun setupContainerViewFragment() {
+
+
     }
 
     private fun scanDocument() {

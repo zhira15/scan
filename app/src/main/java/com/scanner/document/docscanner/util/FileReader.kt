@@ -3,8 +3,7 @@ package com.scanner.document.docscanner.util
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Environment
-import android.util.Log
-import com.scanner.document.docscanner.activities.DocItem
+import com.scanner.document.docscanner.data.model.DocItem
 import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
@@ -17,25 +16,37 @@ import java.util.*
  */
 
 class FileReader {
-    fun walk(root: File): ArrayList<DocItem> {
-        var docList: ArrayList<DocItem> = ArrayList<DocItem>()
-        val df = SimpleDateFormat("dd/MM/yy")
-        val formattedDate = df.format(Calendar.getInstance().time)
-        Timber.e("Current time => $formattedDate")
+    companion object {
 
-        val fileList = root.listFiles() ?: return docList
-        for (file in fileList) {
-            if (file.isDirectory && file.name != "thumbnails") {
-                var b: Bitmap? = null
-                val file = File(Environment.getExternalStorageDirectory(), "/DocumentScanner/thumbnails/" + file.name + ".jpg")
-                try {
-                    b = BitmapFactory.decodeStream(FileInputStream(file))
-                } catch (e: FileNotFoundException) {
-                    e.printStackTrace()
-                }
-                docList.add(DocItem(file.name, formattedDate, b))
-            }
+        object Constants {
+            val DOCS_PATH = "/DocumentScanner/ScannedImage/"
+            val DIR_PATH = android.os.Environment.getExternalStorageDirectory().toString()
         }
-        return docList
+
+        fun walk(): ArrayList<DocItem> {
+
+            val reader = File(Constants.DIR_PATH, Constants.DOCS_PATH)
+            var docList: ArrayList<DocItem> = ArrayList<DocItem>()
+
+            val dateFormat = SimpleDateFormat("dd/MM/yy hh:mm a")
+
+            val fileList = reader.listFiles() ?: return docList
+            for (file in fileList) {
+                if (!file.isDirectory) {
+                    var bitmap: Bitmap? = null
+                    val file = File(Constants.DIR_PATH, Constants.DOCS_PATH + file.name)
+                    val formattedDate = dateFormat.format(file.lastModified())
+                    try {
+                        bitmap = BitmapFactory.decodeStream(FileInputStream(file))
+
+                    } catch (e: FileNotFoundException) {
+                        e.printStackTrace()
+                    }
+                    docList.add(DocItem(file.name, formattedDate, bitmap))
+                }
+            }
+            return docList
+        }
     }
+
 }
